@@ -1,0 +1,202 @@
+#cek partisi
+pastikan tidak ada disk label dos, jika ada silahkan format dengan cara 
+- fdisk
+- gdisk
+
+#set hostname
+sudo hostnamectl set-hostname 03-zulu
+sudo vim /etc/hosts
+sudo reboot
+
+edit hosts
+# Ceph nodes
+10.22.32.151 01-zulu
+10.22.32.152 02-zulu
+10.22.32.153 03-zulu
+10.22.32.154 04-zulu
+10.22.32.155 05-zulu
+
+#create user cephadmin or you can using root with ssh key
+
+sudo useradd -d /home/cephadmin -m cephadmin -s /bin/bash && sudo passwd cephadmin
+echo "cephadmin ALL = (root) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/cephadmin && sudo chmod 0440 /etc/sudoers.d/cephadmin
+
+#Install Ansible and other basic utilities:
+
+sudo apt update
+sudo apt -y install software-properties-common git curl vim bash-completion ansible
+
+#Confirm Ansible has been installed.
+
+
+$ ansible --version
+ansible 2.9.6
+  config file = /etc/ansible/ansible.cfg
+  configured module search path = ['/root/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python3/dist-packages/ansible
+  executable location = /usr/bin/ansible
+  python version = 3.8.2 (default, Apr 27 2020, 15:53:34) [GCC 9.3.0]
+
+
+#Ensure /usr/local/bin path is added to PATH.
+
+echo "PATH=\$PATH:/usr/local/bin" >>~/.bashrc
+source ~/.bashrc
+
+#Check your current PATH:
+
+$ echo $PATH
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/local/bin
+
+#create hosts ansible
+
+vim /etc/ansible/hosts
+[mons]
+01-zulu
+02-zulu
+03-zulu
+04-zulu
+05-zulu
+
+#/etc/ansible/ansible.cfg and uncomment the inventory
+
+#create sshkey at all hosts
+ssh-keygen -t rsa -b 4096 -N '' -f ~/.ssh/id_rsa
+
+#allow root login /etc/ssh/sshd_config
+uncomment 
+PermitRootLogin yes
+
+#restart sshd
+systemctl restart sshd
+
+
+#verify all hosts connected
+ansible all -m ping
+
+#Install Cephadm:
+
+curl --silent --remote-name --location https://github.com/ceph/ceph/raw/octopus/src/cephadm/cephadm
+chmod +x cephadm
+sudo mv cephadm  /usr/local/bin/
+
+#verify cephadmin
+cephadm --help
+
+
+#Step 2: Update all Ceph nodes
+cd ~/
+vim prepare-ceph-nodes.yml
+
+#Modify below contents to set correct timezone and add to the file.
+
+---
+- name: Prepare ceph nodes
+  hosts: ceph_nodes
+  become: yes
+  become_user: root
+  tasks:
+    - name: Set timezone
+      timezone:
+        name: Asia/Jakarta
+
+    - name: Update system
+      apt:
+        name: "*"
+        state: latest
+        update_cache: yes
+
+    - name: Install common packages
+      apt:
+        name: [vim,git,bash-completion,wget,curl,chrony]
+        state: present
+        update_cache: yes
+
+    - name: Set authorized key taken from file to root user
+      authorized_key:
+        user: root
+        state: present
+        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+    - name: Install Docker
+      shell: |
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable" > /etc/apt/sources.list.d/docker-ce.list
+        apt update
+        apt install -qq -y docker-ce docker-ce-cli containerd.io
+    - name: Reboot server after update and configs
+      reboot:
+
+Catatan: reboot is optional
+
+#Save key passphrase if you use one.
+
+$ eval `ssh-agent -s` && ssh-add ~/.ssh/id_rsa_jmutai 
+Agent pid 3275
+Enter passphrase for /root/.ssh/id_rsa_jmutai: 
+Identity added: /root/.ssh/id_rsa_jkmutai (/root/.ssh/id_rsa_jmutai)
+
+#Configure ssh:
+
+tee -a ~/.ssh/config<<EOF
+Host *
+    UserKnownHostsFile /dev/null
+    StrictHostKeyChecking no
+    IdentitiesOnly yes
+    ConnectTimeout 0
+    ServerAliveInterval 300
+EOF
+
+#Execute Playbook:
+
+ansible-playbook -i hosts prepare-ceph-nodes.yml --user root
+
+#optional
+
+Configure /etc/hosts
+Update /etc/hosts on all nodes if you don’t active DNS configured for hostnames on all cluster servers.
+
+Here is the playbook to modify:
+
+$ vim update-hosts.yml
+---
+- name: Prepare ceph nodes
+  hosts: ceph_nodes
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: Clean /etc/hosts file
+      copy:
+        content: ""
+        dest: /etc/hosts
+
+    - name: Update /etc/hosts file
+      blockinfile:
+        path: /etc/hosts
+        block: |
+           127.0.0.1     localhost
+           172.16.20.10  ceph-mon-01
+           172.16.20.11  ceph-mon-02
+           172.16.20.12  ceph-mon-03
+           172.16.20.13  ceph-osd-01
+           172.16.20.14  ceph-osd-02
+           172.16.20.15  ceph-osd-03
+		   
+#Deploy Ceph 15 (Octopus) Storage Cluster on Ubuntu 20.04		   
+sudo mkdir -p /etc/ceph
+cephadm bootstrap \
+  --mon-ip 10.22.32.151 \
+  --initial-dashboard-user ninjafs \
+  --initial-dashboard-password arielgantengbangetdeh \
+  --dashboard-password-noupdate 
+  
+  
+#Troubleshooting
+
+[WARNING]: Consider using the get_url or uri module rather than running 'curl'.  If you need to use command because get_url or uri is
+insufficient you can add 'warn: false' to this command task or set 'command_warnings=False' in ansible.cfg to get rid of this message.
+
+command_warnings=False
+
+
+
