@@ -195,9 +195,16 @@ sudo /usr/local/bin/cephadm install
 if [[ ! -d "/etc/ceph" ]]; then sudo mkdir -p /etc/ceph;fi
 --
 
+cat <<EOF > /root/ceph.conf
+[global]
+public network = 10.22.64.0/24
+cluster network = 10.22.80.0/24
+EOF
+
+
 sudo mkdir -p /etc/ceph
-cephadm bootstrap \
-  --mon-ip 10.22.32.151 \
+cephadm bootstrap -c /root/ceph.conf \
+  --mon-ip 10.22.64.151 \
   --initial-dashboard-user ninjafs \
   --initial-dashboard-password arielgantengbangetdeh \
   --dashboard-password-noupdate 
