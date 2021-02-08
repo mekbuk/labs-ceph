@@ -189,8 +189,12 @@ cephadm bootstrap \
   --initial-dashboard-user ninjafs \
   --initial-dashboard-password arielgantengbangetdeh \
   --dashboard-password-noupdate 
-  
-  
+
+#Install Ceph tools.
+
+cephadm add-repo --release octopus
+cephadm install ceph-common
+
 #Troubleshooting
 
 [WARNING]: Consider using the get_url or uri module rather than running 'curl'.  If you need to use command because get_url or uri is
