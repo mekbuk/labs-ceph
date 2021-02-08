@@ -228,6 +228,9 @@ root@01-zulu:~# sudo ceph orch host add 05-zulu
 #show config
 $  ceph config get mgr
 
+#show list host
+$ ceph orch host ls
+
 #Troubleshooting
 
 **
