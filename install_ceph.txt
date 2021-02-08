@@ -223,6 +223,10 @@ root@01-zulu:~# sudo ceph orch host add 04-zulu
 Added host '04-zulu'
 root@01-zulu:~# sudo ceph orch host add 05-zulu
 
+#validation
+
+#show config
+$  ceph config get mgr
 
 #Troubleshooting
 
