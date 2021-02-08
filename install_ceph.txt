@@ -21,7 +21,7 @@ edit hosts
 sudo useradd -d /home/cephadmin -m cephadmin -s /bin/bash && sudo passwd cephadmin
 echo "cephadmin ALL = (root) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/cephadmin && sudo chmod 0440 /etc/sudoers.d/cephadmin
 
-#Install Ansible and other basic utilities:
+#Install nn and other basic utilities:
 
 sudo apt update
 sudo apt -y install software-properties-common git curl vim bash-completion ansible
@@ -197,10 +197,14 @@ cephadm install ceph-common
 
 #Troubleshooting
 
+**
 [WARNING]: Consider using the get_url or uri module rather than running 'curl'.  If you need to use command because get_url or uri is
 insufficient you can add 'warn: false' to this command task or set 'command_warnings=False' in ansible.cfg to get rid of this message.
 
 command_warnings=False
 
+**
+#install monmaptool 
+apt install ceph-base -y
 
 
