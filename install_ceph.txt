@@ -214,6 +214,16 @@ cephadm bootstrap -c /root/ceph.conf \
 cephadm add-repo --release octopus
 cephadm install ceph-common
 
+#Ceph nodes add via orch(orchestrator)
+root@01-zulu:~# sudo ceph orch host add 02-zulu
+Added host '02-zulu'
+root@01-zulu:~# sudo ceph orch host add 03-zulu
+Added host '03-zulu'
+root@01-zulu:~# sudo ceph orch host add 04-zulu
+Added host '04-zulu'
+root@01-zulu:~# sudo ceph orch host add 05-zulu
+
+
 #Troubleshooting
 
 **
