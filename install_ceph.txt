@@ -232,44 +232,6 @@ $  ceph config get mgr
 $ ceph orch host ls
 
 
-#Creating an erasure-coded pool (referensi: Mastering ceph)
-
-#To see a list of the erasure profiles, run the following command:
-$ ceph osd erasure-code-profile ls
-
-#Let's see what configuration options it contains using the following command:
-$ ceph osd erasure-code-profile get default
-
-#This is almost perfect for our test cluster; however, for the purpose of this exercise, we will
-create a new profile using the following commands:
-$ ceph osd erasure-code-profile set example_profile k=2 m=1 plugin=jerasure technique=reed_sol_van
-$ ceph osd erasure-code-profile ls
-
-#You can see our new example_profile has been created:
-Now, let's create our erasure-coded pool with this profile:
-# ceph osd pool create ecpool 128 128 erasure example_profile
-
-#The preceding command gives the following output:
-The preceding command instructs Ceph to create a new pool called ecpool with 128 PGs.
-It should be an erasure-coded pool and should use the "example_profile"  we previously
-created.
-Let's create an object with a small text string inside it and then prove the data has been
-stored by reading it back:
-$ echo "I am test data for a test object" | rados --pool
-ecpool put Test1 –
-$ rados --pool ecpool get Test1 -
-
-#First, find out what PG is holding the object we just created:
-$ ceph osd map ecpool Test1
-
-#We can now look at the folder structure of the OSDs and see how the object has been split
-using the following commands:
-$ ls -l /var/lib/ceph/osd/ceph-2/current/1.40s0_head/
-# The preceding command gives the following output:
-$ ls -l /var/lib/ceph/osd/ceph-1/current/1.40s1_head/
-# The preceding command gives the following output:
-$ ls -l /var/lib/ceph/osd/ceph-0/current/1.40s2_head/
-
 
 #Troubleshooting
 
@@ -283,10 +245,5 @@ command_warnings=False
 #install monmaptool 
 apt install ceph-base -y
 
-#uninstall ceph & docker
-sudo apt-get remove ceph* && sudo apt-get autoremove ceph* && sudo apt-get purge ceph* && sudo apt-get autoremove --purge ceph*
-sudo rm -fr /etc/systemd/system/ceph* && rm -fr /etc/systemd/system/multi-user.target.wants/ceph* && rm -fr /etc/logrotate.d/ceph* && rm -fr /var/log/ceph
 
-sudo apt-get purge -y docker-engine docker docker.io docker-ce docker-ce-cli && sudo apt-get autoremove -y --purge docker-engine docker docker.io docker-ce  
-sudo rm -rf /var/lib/docker /etc/docker && sudo groupdel docker && sudo rm -rf /var/run/docker.sock && sudo rm /etc/apparmor.d/docker 
 
