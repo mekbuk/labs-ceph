@@ -226,4 +226,10 @@ command_warnings=False
 #install monmaptool 
 apt install ceph-base -y
 
+#uninstall ceph & docker
+sudo apt-get remove ceph* && sudo apt-get autoremove ceph* && sudo apt-get purge ceph* && sudo apt-get autoremove --purge ceph*
+sudo rm -fr /etc/systemd/system/ceph* && rm -fr /etc/systemd/system/multi-user.target.wants/ceph* && rm -fr /etc/logrotate.d/ceph* && rm -fr /var/log/ceph
+
+sudo apt-get purge -y docker-engine docker docker.io docker-ce docker-ce-cli && sudo apt-get autoremove -y --purge docker-engine docker docker.io docker-ce  
+sudo rm -rf /var/lib/docker /etc/docker && sudo groupdel docker && sudo rm -rf /var/run/docker.sock && sudo rm /etc/apparmor.d/docker 
 
