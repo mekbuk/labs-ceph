@@ -131,7 +131,7 @@ Catatan: reboot is optional
 
 #Save key passphrase if you use one.
 
-$ eval `ssh-agent -s` && ssh-add ~/.ssh/id_rsa_jmutai 
+$ eval `ssh-agent -s` && ssh-add ~/.ssh/id_rsa
 Agent pid 3275
 Enter passphrase for /root/.ssh/id_rsa_jmutai: 
 Identity added: /root/.ssh/id_rsa_jkmutai (/root/.ssh/id_rsa_jmutai)
