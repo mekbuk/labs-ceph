@@ -192,6 +192,7 @@ sudo rm /etc/apt/sources.list.d/ceph.list
 sudo rm /etc/apt/trusted.gpg.d/ceph.release.gpg
 sudo /usr/local/bin/cephadm add-repo --release octopus
 sudo /usr/local/bin/cephadm install
+if [[ ! -d "/etc/ceph" ]]; then sudo mkdir -p /etc/ceph;fi
 --
 
 sudo mkdir -p /etc/ceph
