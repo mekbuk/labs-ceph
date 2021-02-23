@@ -1,0 +1,14 @@
+#Dumps the entire configuration database for a whole cluster.
+ceph config dump
+
+#Dumps the configuration for a specific daemon or client (for example, mds.a), as stored in the configuration database.
+ceph config get WHO
+
+#Sets the configuration option to the specified value in the configuration database.
+ceph config set WHO OPTION VALUE
+
+#Shows the reported running configuration for a running daemon. These settings may differ from those stored by the monitors if there are also local configuration files in use, or options have been overridden on the command line or at run time. The source of the option values is reported as part of the output.
+ceph config show WHO
+
+#Imports a configuration file specified as INPUT_FILE and stores any valid options into the configuration database. Any settings that are unrecognized, invalid, or cannot be controlled by the monitor will be returned in an abbreviated file stored as OUTPUT_FILE. This command is useful for transitioning from legacy configuration files to centralized monitor-based configuration.
+ceph config assimilate-conf -i INPUT_FILE -o OUTPUT_FILE
