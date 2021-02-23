@@ -1,0 +1,6 @@
+systemctl list-units --all --type=service ceph*
+
+radosgw-admin zonegroup get
+radosgw-admin sync status
+
+radosgw-admin zonegroup list
