@@ -1,5 +1,8 @@
 # Enter container
 host2:~ # cephadm enter --name mon.host2
 
+OR
+docker exec -it [container-id] bash
+
 #list container
 ceph orch ps
