@@ -4,3 +4,7 @@ radosgw-admin zonegroup get
 radosgw-admin sync status
 
 radosgw-admin zonegroup list
+
+
+ceph restful list-keys
+curl -k https://idcloudhost:c88b0498-3f1d-4e68-b259-feebc52f37bf@is3.cloudhost.id:8003/server
